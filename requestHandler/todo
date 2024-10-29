@@ -1,0 +1,6 @@
+we have to find a way that it can be done in production and where people can get unique ids to their projects and they recieve the project
+
+if we have a domain setup like
+
+abced.prathamalu.xyz
+and our function is handeling requests for this then we can do it easily
