@@ -208,7 +208,7 @@ export function Landing() {
                   variant="outline"
                 >
                   <a
-                    href={`http://${uploadId}.10kdevs.com/index.html`}
+                    href={`https://${uploadId}.deployed.prathamalu.xyz`}
                     target="_blank"
                   >
                     Visit Website
