@@ -135,7 +135,8 @@ export function Landing() {
           <div className="space-y-4">
             <div className="space-y-2">
               <Label className="text-2xl" htmlFor="github-url">
-                GitHub Repository URL
+                GitHub Repository URL To your{" "}
+                <span className="text-red-500 font-bold">React Project</span>
               </Label>
               <Input
                 className="text-xl"
