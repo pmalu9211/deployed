@@ -15,9 +15,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.publisher = exports.subscriber = void 0;
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
+const fs_1 = __importDefault(require("fs"));
 const redis_1 = require("redis");
 const util_1 = require("./util");
 const bucket_1 = require("./bucket");
+const path_1 = __importDefault(require("path"));
 console.log(process.env.redisHost);
 exports.subscriber = (0, redis_1.createClient)({
     url: `redis://${process.env.redisHost}:${process.env.redisPort}`,
@@ -80,6 +82,12 @@ function main() {
                 console.error("Error processing build queue item:", error);
                 // Add a small delay before retrying to prevent tight loop on errors
                 yield new Promise((resolve) => setTimeout(resolve, 1000));
+            }
+            finally {
+                fs_1.default.rmSync(path_1.default.join(__dirname, `output/${folderName}`), {
+                    recursive: true,
+                    force: true,
+                });
             }
         }
     });

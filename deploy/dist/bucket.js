@@ -104,6 +104,12 @@ function copyFinalDist(id) {
             yield _1.publisher.hSet("status", id, "failed");
             console.error(`Error in copying final distribution for folder ${id}:`, error);
         }
+        finally {
+            fs_1.default.rmSync(path_1.default.join(__dirname, `output/${id}`), {
+                recursive: true,
+                force: true,
+            });
+        }
     });
 }
 // Retrieve all files from a directory and its subdirectories
