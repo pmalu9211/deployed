@@ -1,8 +1,10 @@
 import dotenv from "dotenv";
 dotenv.config();
+import fs from "fs";
 import { commandOptions, createClient } from "redis";
 import { buildProject } from "./util";
 import { copyFinalDist, downloadCloudFolder } from "./bucket";
+import path from "path";
 
 console.log(process.env.redisHost);
 
@@ -71,6 +73,11 @@ async function main() {
       console.error("Error processing build queue item:", error);
       // Add a small delay before retrying to prevent tight loop on errors
       await new Promise((resolve) => setTimeout(resolve, 1000));
+    } finally {
+      fs.rmSync(path.join(__dirname, `output/${folderName}`), {
+        recursive: true,
+        force: true,
+      });
     }
   }
 }

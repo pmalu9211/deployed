@@ -199,7 +199,7 @@ export function Landing() {
                     id="deployed-url"
                     readOnly
                     type="url"
-                    value={`http://${uploadId}.dev.100xdevs.com:3001/index.html`}
+                    value={`https://${uploadId}.deployed.prathamalu.xyz`}
                   />
                 </div>
                 <Button

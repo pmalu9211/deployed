@@ -90,6 +90,11 @@ export async function copyFinalDist(id: string) {
       `Error in copying final distribution for folder ${id}:`,
       error
     );
+  } finally {
+    fs.rmSync(path.join(__dirname, `output/${id}`), {
+      recursive: true,
+      force: true,
+    });
   }
 }
 
