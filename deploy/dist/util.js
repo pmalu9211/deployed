@@ -16,9 +16,7 @@ exports.buildProject = buildProject;
 const dockerode_1 = __importDefault(require("dockerode"));
 const path_1 = __importDefault(require("path"));
 const _1 = require(".");
-var docker = new dockerode_1.default({
-    socketPath: "/home/pratham/.docker/desktop/docker.sock",
-});
+var docker = new dockerode_1.default();
 const timeout = 1 * 60 * 1000; // 10 minutes
 function buildProject(id) {
     return __awaiter(this, void 0, void 0, function* () {
