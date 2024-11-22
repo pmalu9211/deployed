@@ -11,20 +11,10 @@ import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import axios from "axios";
-
+import LoadingDots from "./LoadindDots";
+import { DeploymentStatus, LogEntry } from "@/types";
+import GoToDeployment from "./blocks/GoToDeployment";
 const BACKEND_UPLOAD_URL = import.meta.env.VITE_BACKEND_URL;
-
-type LogEntry = {
-  timestamp?: string;
-  entry: string;
-};
-
-type DeploymentStatus =
-  | "idle"
-  | "uploading"
-  | "deploying"
-  | "deployed"
-  | "failed";
 
 export function Landing() {
   const [repoUrl, setRepoUrl] = useState("");
@@ -120,116 +110,149 @@ export function Landing() {
     }
   };
 
+  const sanitizeLogs = (log: string) => log.replace(/[^\x20-\x7E]/g, "");
+
   return (
-    <main className="flex flex-col items-center justify-center min-h-screen  p-4 mt-12 ">
-      <Card className="w-full max-w-2xl">
-        <CardHeader>
-          <CardTitle className="text-4xl">
-            Deploy your GitHub Repository
-          </CardTitle>
-          <CardDescription className="text-md">
-            Enter the URL of your GitHub repository to deploy it
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label className="text-2xl" htmlFor="github-url">
-                GitHub Repository URL To your{" "}
-                <span className="text-red-500 font-bold">React Project</span>
-              </Label>
-              <Input
-                className="text-xl"
-                onChange={(e) => setRepoUrl(e.target.value)}
-                placeholder="https://github.com/username/repo"
-                disabled={status !== "idle"}
-              />
-            </div>
-
-            {error && (
-              <Alert variant="destructive">
-                <AlertTitle>Deployment Error</AlertTitle>
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
-
-            <Button
-              onClick={handleDeploy}
-              disabled={status !== "idle"}
-              className="w-full text-xl bg-blue-400"
-              type="submit"
-            >
-              {status === "uploading"
-                ? "Uploading..."
-                : status === "deploying"
-                ? `Deploying (${uploadId})`
-                : "Deploy"}
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Always show logs card when there's an uploadId */}
-      {uploadId && (
-        <Card className="w-full max-w-2xl mt-8 bg-slate-800">
+    <main className="flex flex-col items-center justify-center  bg-gray-900 min-h-[calc(100vh)] text-white p-4">
+      {status === "deployed" ? (
+        <GoToDeployment uploadId={uploadId} />
+      ) : (
+        <Card className="w-full max-w-2xl bg-gray-800 shadow-lg">
           <CardHeader>
-            <CardTitle className="text-4xl">
+            <CardTitle className="text-3xl font-bold text-cyan-300">
+              Deploy your Frontend(React App)
+            </CardTitle>
+            <CardDescription className="text-sm text-gray-200">
+              Enter the URL of your GitHub repository to deploy it.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label className="text-lg text-white" htmlFor="github-url">
+                  GitHub Repository URL:
+                </Label>
+                <Input
+                  className="text-md bg-gray-700 text-white border border-gray-600 focus:ring-cyan-500"
+                  onChange={(e) => setRepoUrl(e.target.value)}
+                  placeholder="https://github.com/username/repo"
+                  disabled={status !== "idle"}
+                />
+              </div>
+
+              {error && (
+                <Alert
+                  variant="destructive"
+                  className="bg-red-800 text-white border-red-600"
+                >
+                  <AlertTitle className="font-bold">Error</AlertTitle>
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
+
+              <Button
+                onClick={handleDeploy}
+                disabled={status !== "idle"}
+                className={`w-full text-lg ${
+                  status === "uploading"
+                    ? "bg-yellow-500 text-gray-900"
+                    : status === "deploying"
+                    ? "bg-yellow-500 text-gray-900"
+                    : // : status == "deployed"
+                      // ? "bg-[#59D966] text-black"
+                      "bg-[#1D4ED8] hover:bg-blue-600 text-white"
+                }`}
+                type="submit"
+              >
+                {status === "uploading" && (
+                  <>
+                    Uploading
+                    <LoadingDots />
+                  </>
+                )}
+                {status === "deploying" && (
+                  <>
+                    Deploying
+                    <LoadingDots />
+                  </>
+                )}
+
+                {status === "idle" && "Deploy"}
+                {/* {status === "deployed" && "Deployed"} */}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {uploadId && (
+        <Card
+          className={`w-full max-w-2xl mt-8 ${
+            status === "deployed"
+              ? "bg-[#1da942]"
+              : status === "failed"
+              ? "bg-red-700"
+              : "bg-yellow-500"
+          } shadow-md`}
+        >
+          <CardHeader>
+            <CardTitle className="text-4xl text-center font-bold text-black">
               {status === "deployed"
                 ? "Deployment Complete"
                 : status === "failed"
                 ? "Deployment Failed"
                 : "Deployment in Progress"}
             </CardTitle>
-            <CardDescription className="text-md">
+            <CardDescription className="text-xl text-center text-white font-bold">
               {status === "deployed"
                 ? "Your website is successfully deployed!"
                 : status === "failed"
-                ? "Deployment encountered an error"
+                ? "Deployment encountered an error."
                 : "Deploying your repository..."}
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {status === "deployed" && (
-              <>
-                <div className="space-y-2">
-                  <Label className="text-2xl" htmlFor="deployed-url">
-                    Deployed URL
-                  </Label>
-                  <Input
-                    className="text-xl"
-                    id="deployed-url"
-                    readOnly
-                    type="url"
-                    value={`https://${uploadId}.deployed.prathamalu.xyz`}
-                  />
-                </div>
-                <Button
-                  className="w-full mt-4 text-xl bg-blue-400"
-                  variant="outline"
-                >
-                  <a
-                    href={`https://${uploadId}.deployed.prathamalu.xyz`}
-                    target="_blank"
-                  >
-                    Visit Website
-                  </a>
-                </Button>
-              </>
-            )}
-
-            {/* Always show logs when available */}
             {logs.length > 0 && (
-              <div className="mt-4 p-2 bg-gray-100 dark:bg-gray-800 rounded-md max-h-64 overflow-y-auto">
-                <h2 className="text-lg font-semibold mb-2">Deployment Logs:</h2>
-                <ul className="text-sm">
-                  {logs.map((log, index) => (
-                    <li key={index} className="mb-1 font-mono">
-                      <span className="text-gray-500 inline-block py-2">
-                        {log.timestamp || ""}
-                      </span>{" "}
-                      {log.entry}
-                    </li>
-                  ))}
+              <div className="p-4 bg-gray-900 rounded-md max-h-80 overflow-y-auto">
+                <h2 className="text-lg font-semibold mb-2 text-gray-300">
+                  Deployment Logs:
+                </h2>
+                <ul className="text-sm font-mono">
+                  {logs.map((log, index) => {
+                    const sanitizedLog = sanitizeLogs(log.entry);
+                    const isStdout = sanitizedLog.startsWith("stdout:");
+                    const isStderr = sanitizedLog.startsWith("stderr:");
+
+                    return (
+                      <li key={index} className="mb-1">
+                        <span className="text-cyan-400 font-bold">
+                          {log.timestamp || "No Timestamp"}
+                        </span>{" "}
+                        <span
+                          className={`${
+                            isStdout
+                              ? "text-green-500 font-bold"
+                              : isStderr
+                              ? "text-red-500 font-bold"
+                              : "text-gray-400"
+                          }`}
+                        >
+                          {isStdout
+                            ? "stdout"
+                            : isStderr
+                            ? "stderr"
+                            : "unknown"}
+                          :
+                        </span>{" "}
+                        <span className="italic text-gray-100">
+                          {sanitizedLog.replace(/^(stdout|stderr):\s*/, "")}
+                        </span>
+                        {status === "deploying" &&
+                          index === logs.length - 1 && <LoadingDots />}
+                        <div className="text-gray-600 text-xs">---</div>
+                      </li>
+                    );
+                  })}
                 </ul>
               </div>
             )}
