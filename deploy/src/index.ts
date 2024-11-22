@@ -49,30 +49,22 @@ async function main() {
       0
     );
     const folderName = response?.element;
+
+    if (!folderName) continue;
+    console.log("hello ", folderName);
+
     try {
-      if (folderName) {
-        console.log(`Starting download for folder: ${folderName}`);
-        await downloadCloudFolder(`output/${folderName}/`);
-        console.log(`Download complete for folder: ${folderName}`);
+      console.log(`Starting download for folder: ${folderName}`);
+      await downloadCloudFolder(`output/${folderName}/`);
+      console.log(`Download complete for folder: ${folderName}`);
 
-        console.log(`Starting build for folder: ${folderName}`);
-        await buildProject(folderName);
-        console.log(`Build complete for folder: ${folderName}`);
+      console.log(`Starting Dockerized build for folder: ${folderName}`);
+      await buildProject(folderName);
 
-        console.log(`Copying final distribution for folder: ${folderName}`);
-        await copyFinalDist(folderName);
-        console.log(`Distribution copied for folder: ${folderName}`);
-
-        await publisher.hSet("status", folderName, "deployed");
-        console.log(`Status updated to "deployed" for folder: ${folderName}`);
-      }
+      console.log(`Copying final distribution for folder: ${folderName}`);
+      await copyFinalDist(folderName);
     } catch (error) {
-      if (folderName) {
-        await publisher.hSet("status", folderName, "failed");
-      }
-      console.error("Error processing build queue item:", error);
-      // Add a small delay before retrying to prevent tight loop on errors
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      console.error(`Error processing build for folder: ${folderName}`, error);
     } finally {
       fs.rmSync(path.join(__dirname, `output/${folderName}`), {
         recursive: true,

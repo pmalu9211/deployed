@@ -60,28 +60,20 @@ function main() {
         while (true) {
             const response = yield exports.subscriber.brPop((0, redis_1.commandOptions)({ isolated: true }), "build-queue", 0);
             const folderName = response === null || response === void 0 ? void 0 : response.element;
+            if (!folderName)
+                continue;
+            console.log("hello ", folderName);
             try {
-                if (folderName) {
-                    console.log(`Starting download for folder: ${folderName}`);
-                    yield (0, bucket_1.downloadCloudFolder)(`output/${folderName}/`);
-                    console.log(`Download complete for folder: ${folderName}`);
-                    console.log(`Starting build for folder: ${folderName}`);
-                    yield (0, util_1.buildProject)(folderName);
-                    console.log(`Build complete for folder: ${folderName}`);
-                    console.log(`Copying final distribution for folder: ${folderName}`);
-                    yield (0, bucket_1.copyFinalDist)(folderName);
-                    console.log(`Distribution copied for folder: ${folderName}`);
-                    yield exports.publisher.hSet("status", folderName, "deployed");
-                    console.log(`Status updated to "deployed" for folder: ${folderName}`);
-                }
+                console.log(`Starting download for folder: ${folderName}`);
+                yield (0, bucket_1.downloadCloudFolder)(`output/${folderName}/`);
+                console.log(`Download complete for folder: ${folderName}`);
+                console.log(`Starting Dockerized build for folder: ${folderName}`);
+                yield (0, util_1.buildProject)(folderName);
+                console.log(`Copying final distribution for folder: ${folderName}`);
+                yield (0, bucket_1.copyFinalDist)(folderName);
             }
             catch (error) {
-                if (folderName) {
-                    yield exports.publisher.hSet("status", folderName, "failed");
-                }
-                console.error("Error processing build queue item:", error);
-                // Add a small delay before retrying to prevent tight loop on errors
-                yield new Promise((resolve) => setTimeout(resolve, 1000));
+                console.error(`Error processing build for folder: ${folderName}`, error);
             }
             finally {
                 fs_1.default.rmSync(path_1.default.join(__dirname, `output/${folderName}`), {
