@@ -3,8 +3,7 @@ import path from "path";
 import { publisher } from ".";
 
 var docker = new Docker();
-const timeout = 1 * 60 * 1000; // 10 minutes
-
+const timeout = 3 * 60 * 1000; // 3 minutes
 export async function buildProject(id: string) {
   console.log(`[INFO] Starting Dockerized build for: ${id}`);
 

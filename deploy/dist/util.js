@@ -17,7 +17,7 @@ const dockerode_1 = __importDefault(require("dockerode"));
 const path_1 = __importDefault(require("path"));
 const _1 = require(".");
 var docker = new dockerode_1.default();
-const timeout = 1 * 60 * 1000; // 10 minutes
+const timeout = 3 * 60 * 1000; // 3 minutes
 function buildProject(id) {
     return __awaiter(this, void 0, void 0, function* () {
         console.log(`[INFO] Starting Dockerized build for: ${id}`);
