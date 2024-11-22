@@ -178,7 +178,7 @@ export function Landing() {
                 )}
 
                 {status === "idle" && "Deploy"}
-                {/* {status === "deployed" && "Deployed"} */}
+                {status === "failed" && "Failed"}
               </Button>
             </div>
           </CardContent>
