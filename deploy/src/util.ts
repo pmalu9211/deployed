@@ -2,9 +2,7 @@ import Docker from "dockerode";
 import path from "path";
 import { publisher } from ".";
 
-var docker = new Docker({
-  socketPath: "/home/pratham/.docker/desktop/docker.sock",
-});
+var docker = new Docker();
 const timeout = 1 * 60 * 1000; // 10 minutes
 
 export async function buildProject(id: string) {
