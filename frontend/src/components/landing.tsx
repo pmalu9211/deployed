@@ -113,7 +113,7 @@ export function Landing() {
   const sanitizeLogs = (log: string) => log.replace(/[^\x20-\x7E]/g, "");
 
   return (
-    <main className="flex flex-col items-center justify-center  bg-gray-900 min-h-[calc(100vh)] text-white p-4">
+    <main className="flex flex-col items-center justify-center  bg-black min-h-[calc(100vh)] text-white p-4">
       {status === "deployed" ? (
         <GoToDeployment uploadId={uploadId} />
       ) : (

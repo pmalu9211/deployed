@@ -1,19 +1,19 @@
 import { FC, ReactNode, useRef } from "react";
 import { motion, MotionValue, useScroll, useTransform } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { useNavigate } from "react-router-dom";
 
 interface TextRevealByWordProps {
   text: string;
   className?: string;
-  setSkipHome: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export const TextRevealByWord: FC<TextRevealByWordProps> = ({
   text,
   className,
-  setSkipHome,
 }) => {
   const targetRef = useRef<HTMLDivElement | null>(null);
+  const navigate = useNavigate();
 
   const { scrollYProgress } = useScroll({
     target: targetRef,
@@ -49,7 +49,9 @@ export const TextRevealByWord: FC<TextRevealByWordProps> = ({
         className="absolute bottom-[15%] left-1/2 transform -translate-x-1/2"
       >
         <button
-          onClick={() => setSkipHome(true)}
+          onClick={() => {
+            navigate("home");
+          }}
           className="px-6 py-3 bg-blue-600 text-white rounded-lg shadow-lg hover:bg-blue-700 text-xl"
         >
           Deploy Now 🚀

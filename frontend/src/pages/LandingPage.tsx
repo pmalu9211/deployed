@@ -4,18 +4,14 @@ import { RippleDemo } from "@/components/ui/RippleDemo";
 import { TextRevealDemo } from "@/components/ui/TextReveal";
 import { ScrollBasedVelocityDemo } from "@/components/ui/VelocityBasedScorll";
 
-interface setState {
-  setSkipHome: React.Dispatch<React.SetStateAction<boolean>>;
-}
-
-const LandingPage = ({ setSkipHome }: setState) => {
+const LandingPage = () => {
   return (
     <>
-      <RetroGridDemo setSkipHome={setSkipHome} />
+      <RetroGridDemo />
       <ScrollBasedVelocityDemo />
       <div className="flex h-full ">
         <div className="flex-1 flex items-center justify-center">
-          <TextRevealDemo setSkipHome={setSkipHome} />
+          <TextRevealDemo />
         </div>
         <div className="flex-1 flex items-center justify-center">
           <RippleDemo />
