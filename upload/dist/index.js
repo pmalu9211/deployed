@@ -41,9 +41,17 @@ exports.publisher = (0, redis_1.createClient)({
     }
 }))();
 const app = (0, express_1.default)();
-app.use((0, cors_1.default)());
+const corsOptions = {
+    origin: 'https://deployed.prathamalu.xyz',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed HTTP methods (adjust as needed)
+    credentials: true, // If you need to support cookies or authorization headers
+};
+app.use((0, cors_1.default)(corsOptions));
 app.use(express_1.default.json());
 // Route for deploying a repository
+app.get("/ping", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    res.status(200).json({ message: "working fine pong" });
+}));
 app.post("/deploy", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const repoUrl = req.body.repoUrl;

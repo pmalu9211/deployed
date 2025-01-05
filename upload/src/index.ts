@@ -29,10 +29,20 @@ export const publisher = createClient({
 })();
 
 const app = express();
-app.use(cors());
+const corsOptions = {
+  origin: 'https://deployed.prathamalu.xyz', 
+  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed HTTP methods (adjust as needed)
+  credentials: true, // If you need to support cookies or authorization headers
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // Route for deploying a repository
+
+app.get("/ping", async (req, res)=>{
+  res.status(200).json({message : "working fine pong"})  
+})
 app.post("/deploy", async (req, res) => {
   try {
     const repoUrl = req.body.repoUrl;
