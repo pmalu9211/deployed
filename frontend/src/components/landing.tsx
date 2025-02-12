@@ -9,11 +9,16 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+} from "@/components/ui/alert";
 import axios from "axios";
 import LoadingDots from "./LoadindDots";
 import { DeploymentStatus, LogEntry } from "@/types";
 import GoToDeployment from "./blocks/GoToDeployment";
+
 const BACKEND_UPLOAD_URL = import.meta.env.VITE_BACKEND_URL;
 
 export function Landing() {
@@ -22,6 +27,7 @@ export function Landing() {
   const [status, setStatus] = useState<DeploymentStatus>("idle");
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [showNotification, setShowNotification] = useState(true);
 
   // Fetch logs periodically when deployment is in progress
   useEffect(() => {
@@ -32,11 +38,11 @@ export function Landing() {
         const res = await axios.get(
           `${BACKEND_UPLOAD_URL}/logs?id=${uploadId}`
         );
-        setLogs((e) => e.concat(res.data.logs) || e);
+        setLogs((prev) => prev.concat(res.data.logs) || prev);
       } catch (error) {
         console.error("Error fetching logs:", error);
       }
-      if (status == "deployed" || status == "failed") {
+      if (status === "deployed" || status === "failed") {
         clearInterval(logsInterval);
       }
     };
@@ -113,14 +119,61 @@ export function Landing() {
   const sanitizeLogs = (log: string) => log.replace(/[^\x20-\x7E]/g, "");
 
   return (
-    <main className="flex flex-col items-center justify-center  bg-black min-h-[calc(100vh)] text-white p-4">
+    <main className="flex flex-col items-center justify-center bg-black min-h-[calc(100vh)] text-white p-4">
+      {/* Cool & Prominent Dismissible Notification */}
+      {showNotification && (
+        <Alert
+          // variant="
+          className="w-full max-w-2xl mb-4 flex flex-col sm:flex-row items-center justify-between bg-gradient-to-r from-purple-600 to-blue-500 text-white p-6 rounded-md shadow-2xl border border-white"
+        >
+          <div className="flex-1">
+            <AlertTitle className="font-extrabold text-2xl">
+              Important Service Notice
+            </AlertTitle>
+            <AlertDescription className="mt-2 text-lg">
+              Due to unforeseen financial constraints, I'm currently unable
+              to cover the machine bills—this means the deployment service is
+              temporarily offline.
+              <br className="sm:hidden" />
+              However, you can still experience the project:
+              <span className="mt-2 block">
+                <a
+                  href="https://www.linkedin.com/feed/update/urn:li:activity:7267084694628835328/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline font-semibold text-white hover:text-yellow-300"
+                >
+                  Watch Demo Video
+                </a>{" "}
+                |{" "}
+                <a
+                  href="https://github.com/pmalu9211/deployed"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline font-semibold text-white hover:text-yellow-300"
+                >
+                  View GitHub Code
+                </a>
+              </span>
+            </AlertDescription>
+          </div>
+          <button
+            onClick={() => setShowNotification(false)}
+            className="mt-4 sm:mt-0 text-3xl font-bold leading-none ml-4 text-white opacity-75 hover:opacity-100"
+            aria-label="Close notification"
+          >
+            &times;
+          </button>
+        </Alert>
+      )}
+
       {status === "deployed" ? (
         <GoToDeployment uploadId={uploadId} />
       ) : (
         <Card className="w-full max-w-2xl bg-gray-800 shadow-lg">
           <CardHeader>
             <CardTitle className="text-3xl font-bold text-cyan-300">
-              Deploy your Frontend(React App)
+              Deploy your Frontend (React App)
             </CardTitle>
             <CardDescription className="text-sm text-gray-200">
               Enter the URL of your GitHub repository to deploy it.
@@ -154,13 +207,9 @@ export function Landing() {
                 onClick={handleDeploy}
                 disabled={status !== "idle"}
                 className={`w-full text-lg ${
-                  status === "uploading"
+                  status === "uploading" || status === "deploying"
                     ? "bg-yellow-500 text-gray-900"
-                    : status === "deploying"
-                    ? "bg-yellow-500 text-gray-900"
-                    : // : status == "deployed"
-                      // ? "bg-[#59D966] text-black"
-                      "bg-[#1D4ED8] hover:bg-blue-600 text-white"
+                    : "bg-[#1D4ED8] hover:bg-blue-600 text-white"
                 }`}
                 type="submit"
               >
@@ -176,7 +225,6 @@ export function Landing() {
                     <LoadingDots />
                   </>
                 )}
-
                 {status === "idle" && "Deploy"}
                 {status === "failed" && "Failed"}
               </Button>
